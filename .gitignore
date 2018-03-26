@@ -233,3 +233,5 @@ TSWLatexianTemp*
 # standalone packages
 *.sta
 
+# gnome-latex opened files
+*.tex~
