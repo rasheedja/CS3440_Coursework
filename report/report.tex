@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{parskip}
+\usepackage[a4paper, margin=1.25in]{geometry}
 
 \title{Data Mining Coursework}
 \author{Junaid Ali Rasheed}
@@ -17,7 +18,7 @@
 
 \noindent In this report, we provide a solution for a Portuguese banking institution looking to determine whether
 a client will make a term deposit or not. The institution provided us with two datasets, a training
-dataset containing 36,188 instances, and a testing dataset containing 9042 instances. A variety
+dataset containing 36,169 instances, and a testing dataset containing 9042 instances. A variety
 of data exploration and visualisation techniques were used to examine the dataset which determined
 that we could not predict whether or not a client will subscribe to a term deposit using just two
 attributes. Quite a few of the numerical attributes provided were negatively skewed. Attribute
@@ -26,7 +27,7 @@ one with three attributes and another with eight attributes. We then ran a numbe
 algorithms on these datasets and performed various experiments in order to optimise the parameters used
 for these algorithms. The J4.8 model with the minimum number of objects parameter set to 10 performed best
 and was estimated to be 90.6\% accurate (using 10-fold cross-validation). These models were also assessed
-under an unequal cost scenario, where misclassifying a client who will subscribe to a term deposit is 10
+under an unequal cost scenario, where misclassifying a client who will subscribe to a term deposit costs 10
 times more than misclassifying a client who will. The same J4.8 model also performed best in the unequal
 cost scenario, with a cost of 10561. The model was then ran on the test dataset which contained 9042
 clients. The default rule on the test dataset had an accuracy of 87.8\% and a cost 7941. The model achieved
@@ -50,7 +51,7 @@ will then be evaluated on \textbf{cworkPredict.arff}
 
 \subsection{The Training Dataset}
 
-The training dataset is \textbf{cworkTrain.arff} which can be used with Weka. Opening
+The training dataset is \textbf{cworkTrain.arff}. Opening
 the file in a text editor gives us a brief description of each attribute in the dataset.
 The attributes in the dataset are described in Table ~\ref{tab:attributeTable}.
 
@@ -86,7 +87,7 @@ reveals the following...
 
 \begin{itemize}
   \item{The number of clients (people who were contacted by the banking institution) in
-  the dataset is 36,188.}
+  the dataset is 36,169.}
   \item{31,981 clients did not subscribe to a term deposit, 4188 clients did subscribe to a term deposit.}
   \item{88.4\% of clients did not subscribe to a term deposit. This is the accuracy of the default classifier.} 
   \item{There are 16 attributes (excluding the output attribute, 'termDeposit'), reducing the number of attributes may be beneficial to avoid overfitting..}
@@ -263,7 +264,7 @@ also had a negatively skewed distribution but this attribute is not in the datas
 easiest way to resolve this issue is to run the discretise filter. This will discretise numerical attributes into
 a specified number of nominal bins.
 
-Attributes in both datasets were discretised into 10 bins of equal frequency for both datasets. For the three-attribute
+Attributes in both datasets were discretised into 10 bins of equal frequency. For the three-attribute
 dataset, the naive Bayes classifier achieved an accuracy of 89.3\%, a slight improvement when compared to the base benchmark.
 An accuracy of 88.2\% was achieved by the naive Bayes classifier after discretising the eight-attribute dataset into
 10 bins of equal frequency.
@@ -314,7 +315,7 @@ No distance weighting needs to be done.
 \subsubsection{J4.8}
 
 For the J4.8 classifier, the key parameters to experiment with are the ones that control the complexity of the model.
-These parameters are Post-pruning, Reduced error pruning, and Minimum number of objects. J4.8 performed best with
+These parameters are post-pruning, reduced error pruning, and minimum number of objects. J4.8 performed best with
 all attributes so all of the experiments were carried out on the original training dataset (see Table ~\ref{tab:J48Params}).
 
 \begin{table}[H]
@@ -343,13 +344,13 @@ parameter is set to 10.
 
 \subsubsection{OneR}
 
-All of the benchmark models for the OneR classifier had the same performance no matter what attribute set we used. This
+All of the benchmark models for the OneR classifier had the same performance for all attribute sets. This
 is because the OneR classifier only uses one attribute for determining whether a client will subscribe to a term deposit
-or not. So to allow the classifier to choose the best attribute for itself, we will use the full attribute set to
+or not. So, to allow the classifier to choose the best attribute for itself, we will use the full attribute set to
 further develop this model.
 
 The OneR classifier discretises all numerical attributes into different buckets, similar to what the discretise 
-attribute filter does. The classifier takes in a parameter, 'minBucketSize', which specifies the minimum number of objects 
+attribute filter does. The classifier takes in a parameter, "minBucketSize", which specifies the minimum number of objects 
 that must be in a bucket. In Table ~\ref{tab:OneRParams}, we experimented with this parameter and determined that a minimum
 bucket size of 18 gives us the most accurate model.
 
@@ -446,20 +447,20 @@ following confusion matrix:
 \begin{table}[H]
   \begin{center}
     \begin{tabular}{l l }
-      26418 & 5563 \\
-      1496 & 2692 \\
+      24791 & 7190 \\
+      961 & 3227 \\
     \end{tabular}
   \end{center}
   \label{tab:naiveBayesCost}
 \end{table}
 
-The cost of this matrix is $ 5563 \times 1 + 1496 \times 10 = 20523 $.
+The cost of this matrix is $ 7190 \times 1 + 961 \times 10 = 16800 $.
 
 \subsubsection{k-nearest Neighbour}
 
 We ran this classifier with the cost sensitive meta classifier, using the three-attribute dataset, 9 neighbours, 
 and no distance weighting. Because the k-nearest neighbour classifier does not give us estimates of class posterior 
-probability, we will set the minimise expected cost parameter to false. This tells the meta classifier to reweigh 
+probability, we set the minimise expected cost parameter to false. This tells the meta classifier to reweigh 
 the training instances using the cost matrix. This resulted in the following confusion matrix:
 
 \begin{table}[H]
@@ -472,7 +473,7 @@ the training instances using the cost matrix. This resulted in the following con
   \label{tab:kNNCost}
 \end{table}
 
-The cost of this matrix is $ 8154 \times 1 + 962 \times 10 = 17704 $. This is less than the cost for naive Bayes.
+The cost of this matrix is $ 8154 \times 1 + 962 \times 10 = 17704 $. This is more than the cost for naive Bayes.
 
 \subsubsection{J4.8}
 This classifier was ran with the cost sensitive meta classifier using the full training dataset and the minimum
