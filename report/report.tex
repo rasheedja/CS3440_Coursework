@@ -9,12 +9,29 @@
 \title{Data Mining Coursework}
 \author{Junaid Ali Rasheed}
 
-
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
+
+\noindent In this report, we provide a solution for a Portuguese banking institution looking to determine whether
+a client will make a term deposit or not. The institution provided us with two datasets, a training
+dataset containing 36,188 instances, and a testing dataset containing 9042 instances. A variety
+of data exploration and visualisation techniques were used to examine the dataset which determined
+that we could not predict whether or not a client will subscribe to a term deposit using just two
+attributes. Quite a few of the numerical attributes provided were negatively skewed. Attribute
+selection techniques were used to reduce the original sixteen attributes into two reduced datasets,
+one with three attributes and another with eight attributes. We then ran a number of machine learning
+algorithms on these datasets, and performed various experiments in order to optimise the parameters used
+for these algorithms. The J4.8 model with the minimum number of objects parameter set to 10 performed best
+and was estimated to be 90.6\% accurate (using 10-fold cross-validation). These models were also assessed
+under an unequal cost scenario, where misclassifying a client who will subscribe to a term deposit is 10
+times worse than misclassifying a client who will. The same J4.8 model also performed best in the unequal
+cost scenario, with a cost of 10561. The modal was then ran on the test dataset which contained 9042
+clients. The default rule on the test dataset had an accuracy of 87.8\% and a cost 7941. The model achieved
+an accuracy of 90.3\% in the equal cost scenario and a cost of 2641 in the unequal cost scenario.
+
 \end{abstract}
 
 \section{Introduction}
@@ -242,7 +259,7 @@ for each model.
 
 \subsubsection{Naive Bayes}
 
-This model performed equally well on the three-attribute dataset and the eight-attribute dataset so we will
+This model had the same performance on the three-attribute dataset and the eight-attribute dataset so we will
 experiment with both datasets to determine the settings for the most optimal model. The naive Bayes classifier
 assumes that numeric attributes have a normal distribution. During our initial data exploration, we discovered
 that some attributes, namely pdays (a14) and previous (a15) were very negatively skewed. The balance (a6) attribute
@@ -302,23 +319,23 @@ No distance weighting needs to be done.
 
 For the J4.8 classifier, the key parameters to experiment with are the ones that control the complexity of the model.
 These parameters are Post-pruning, Reduced error pruning, and Minimum number of objects. J4.8 performed best with
-all attributes so all of the experiments were carried out on the original training dataset (see Table ~\ref{tab:J48Params}.
+all attributes so all of the experiments were carried out on the original training dataset (see Table ~\ref{tab:J48Params}).
 
 \begin{table}[H]
   \begin{center}
     \begin{tabular}{l | r | r}
       Parameter & Parameter Value & Accuracy  \\ \hline
-      Confidence Factor | 0.40 | 89.9\% \\
-      Confidence Factor | 0.35 | 90.1\% \\
-      Confidence Factor | 0.30 | 90.3\% \\
-      Confidence Factor | 0.25 | 90.4\% \\
-      Confidence Factor | 0.20 | 90.5\% \\
-      Confidence Factor | 0.15 | 90.5\% \\
-      Confidence Factor | 0.10 | 90.4\% \\
-      Reduced error pruning (seed = 1) | True | 90.1\% \\
-      Minimum number of objects  | 10 | 90.6\% \\
-      Minimum number of objects  | 20 | 90.3\% \\
-      Minimum number of objects  | 30 | 90.4\% \\
+      Confidence Factor & 0.40 & 89.9\% \\
+      Confidence Factor & 0.35 & 90.1\% \\
+      Confidence Factor & 0.30 & 90.3\% \\
+      Confidence Factor & 0.25 & 90.4\% \\
+      Confidence Factor & 0.20 & 90.5\% \\
+      Confidence Factor & 0.15 & 90.5\% \\
+      Confidence Factor & 0.10 & 90.4\% \\
+      Reduced error pruning (seed = 1) & True & 90.1\% \\
+      Minimum number of objects  & 10 & 90.6\% \\
+      Minimum number of objects  & 20 & 90.3\% \\
+      Minimum number of objects  & 30 & 90.4\% \\
     \end{tabular}
   \end{center}
   \caption{Results of modifying J4.8 complexity parameters}
@@ -328,11 +345,252 @@ all attributes so all of the experiments were carried out on the original traini
 The best performing model is when the minimum number of objects parameter is set to 10. The other models do have similar
 accuracies but we went forward using the parameter that gave us the most accuracy for this model.
 
-\subsection{Combining Models}
+\subsubsection{OneR}
+
+All of the benchmark models for the OneR classifier had the same performance no matter what attribute set we used. This
+is because the OneR classifier only uses one attribute for determining whether a client will subscribe to a term deposit
+or not. So to allow the classifier to choose the best attribute for itself, we will use the full attribute set to
+further develop this model.
+
+The OneR classifier discretises all numerical attributes into different buckets, similar to what the discretise 
+attribute filter does. The classifier takes in a parameter, 'minBucketSize', which specifies the minimum number of objects 
+that must be in a bucket. In Table ~\ref{tab:OneRParams}, we experimented with this parameter and determined that a minimum
+bucket size of 18 gives us the most accurate model.
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{r | r }
+      Minimum Bucket Size & Accuracy  \\ \hline
+      6 & 88.5\% \\
+      8 & 88.6\% \\
+      10 & 88.6\% \\
+      12 & 88.7\% \\
+      14 & 88.9\% \\
+      16 & 89.2\% \\
+      18 & 89.3\% \\
+    \end{tabular}
+  \end{center}
+  \caption{Results of varying the minimum bucket size parameter}
+  \label{tab:OneRParams}
+\end{table}
+
+
+\subsubsection{Logistic Regression}
+
+The full training dataset gave us the best performance for this classifier so that is what we used.  This classifier uses
+a ridge estimator and the ridge value is available for us to alter as a parameter. A smaller ridge parameter results
+in a more flexible model. The results of experimenting with the ridge value are shown in Table ~\ref{tab:LogisticParams}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{r | r }
+      Ridge Value & Accuracy  \\ \hline
+      $ 1 \times 10^{-8} $ & 90.2\% \\
+      $ 1 \times 10^{-4} $ & 90.2\% \\
+      $ 1 \times 1 $ & 90.2\% \\
+      $ 1 \times 10 $ & 90.2\% \\
+    \end{tabular}
+  \end{center}
+  \caption{Results of varying the minimum bucket size parameter}
+  \label{tab:LogisticParams}
+\end{table}
+
+As you can see in Table ~\ref{tab:LogisticParams}, changing the ridge parameter did not alter the accuracy of the resulting
+model in any meaningful way, so we decided to keep the ridge parameter at it's default setting ($ 1 \times 10^{-8} $)
+
+\subsubsection{Voting Committee}
+
+We now have five strongly performing models. All these models have an accuracy that is better than the default accuracy (88.4\%).
+We tried to combine all these models into a voting committee, all the models will vote on whether a client will subscribe to a term
+deposit or not and the majority wins. The models chosen are naive Bayes with numerical attributes being discretised
+into 15 bins of equal frequency, k-nearest neighbour with k set to 9, J4.8 with the minimum number of objects parameter set to 10,
+OneR with the minimum bucket size parameter set to 18, and logistic regression with default parameters.
+
+Because of the difficulties of using a different training set for different models in a voting committee, we decided to train
+our models on the eight-attribute dataset. This dataset gives us the best performance for the naive Bayes and the OneR
+classifiers. The performances of the other classifiers are only very slightly reduced on the eight attribute dataset when compared
+to the optimal dataset for these classifiers.
+
+After running the voting committee on the dataset with the best setting for all five classifiers, the overall performance with
+10-fold cross-validation was \textbf{90.0\%}. While this is pretty accurate, the voting committee is still beaten by both
+the logistic regression model and the J4.8 model.
+
+\subsubsection{Model Selection}
+
+By experimenting with different classifiers and their parameters, we have determined that the J4.8 classifier with the minimum
+number of objects parameter set to 10 produces the most accurate model. The J4.8 model has an estimated accuracy of 90.6\%
+when using 10-fold cross-validation.
 
 \subsection{Cost-based Modelling}
 
+In this section, we ran all five models developed in the previous section using an unequal cross matrix. In the unequal
+cost scenario specified by the banking institution, the cost of misclassifying a client who will subscribe to a term deposit
+is 10 times that of misclassifying a client who will not. The cost matrix for this has the following structure:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      0.0 & 1.0 \\
+      10.0 & 0.0 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:costMatrixStructure}
+\end{table}
+
+The default cost on the training set for a classifier that predicts that everyone will subscribe to a term deposit is equal
+to the number of people that will not subscribe to a term deposit; 31981.
+
+\subsubsection{Naive Bayes}
+
+We ran the naive Bayes classifier with the three-attribute dataset and numerical attributes discretised into 15 bins
+with the cost sensitive meta classifier. The naive Bayes model does give us estimates of class posterior
+probabilities so we will run it with the minimise expected cost parameter set to true. This gave us the 
+following confusion matrix:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      26418 & 5563 \\
+      1496 & 2692 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:naiveBayesCost}
+\end{table}
+
+The cost of this matrix is $ 5563 \times 1 + 1496 \times 10 = 20523 $.
+
+\subsubsection{k-nearest Neighbour}
+
+We ran this classifier with the three-attribute dataset, 9 neighbours, and no distance weighting. We ran this
+classifier with the cost sensitive meta classifier. Because the k-nearest neighbour classifier does not give us
+estimates of class posterior probability, we will set the minimise expected cost parameter to false. This tells
+the meta classifier to reweigh the training instances using the cost matrix. This resulted in the following
+confusion matrix:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      23827 & 8154 \\
+      962 & 3226 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:kNNCost}
+\end{table}
+
+The cost of this matrix is $ 8154 \times 1 + 962 \times 10 = 17704 $. This is less than the cost for naive Bayes.
+
+\subsubsection{J4.8}
+This classifier was ran with the cost sensitive meta classifier using the full training dataset and the minimum
+number of objects parameter set to 10. Like k-nearest neighbour, this classifier does not give us estimates of
+class posterior probabilities so we set the minimise expected cost parameter to false. This gave us the following
+confusion matrix:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      26270 & 5711 \\
+      485 & 3703 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:J48Cost}
+\end{table}
+
+The cost of this matrix is $ 5711 \times 1 + 485 \times 10 = 10561 $. This is the best cost so far.
+margin.
+
+\subsubsection{OneR}
+For the OneR classifier, we used the full training set and set the minimum bucket size parameter to 18. This
+classifier also does not give us estimates of class posterior probability so we set the minimise expected cost
+parameter of the cost sensitive meta classifier to false. This gave us the following confusion matrix:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      20628 & 11353 \\
+      990 & 3198 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:OneRCost}
+\end{table}
+
+The cost of this matrix is $ 11353 \times 1 + 990 \times 10 = 21253 $. This is the significantly worse than all
+other costs.
+
+\subsubsection{Logistic Regression}
+
+We used the full training set again for this classifier with default parameters. Since this classifier does give
+us posterior probabilities, we set the minimise expected cost parameter of the cost sensitive meta classifier
+to true. The confusion matrix produced is shown below:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      25375 & 6606 \\
+      514 & 3674 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:LogisticCost}
+\end{table}
+
+The cost of this matrix is $ 6606 \times 1 + 514 \times 10 = 11746 $. This is worse than the cost for the J4.8 model.
+other costs.
+
+\subsubsection{Model Selection}
+From the results reported here, we can clearly see that the J4.8 classifier produces the best model for the unequal
+cost problem. It significantly outperforms most of the other classifiers, with only the logistic regression classifier
+coming close. Because of this, it is not worth developing a voting model, the J4.8 classifier is the way to go for
+this scenario.
+
 \section{Conclusion}
 
+In this section, we will evaluate our best model, the J4.8 classifier for both the equal cost and the unequal cost scenario,
+on the test set. Then, I will talk about what I have learned by doing this coursework.
+
+\subsubsection{Evaluation}
+The accuracy of the J4.8 model with the minimum number of objects set to 10 on the test dataset with equal costs was 90.3\%.
+This is pretty good, the accuracy of the default classifier on the test dataset 87.8\%. The confusion matrix on the test set
+for this classifier was:
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      7774 & 167 \\
+      737 & 363 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:J48EqualTestCost}
+\end{table}
+
+Running the cost sensitive J4.8 model on the test set with unequal costs gave us the following confusion matrix.
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{l l }
+      6510 & 1431 \\
+      121 & 980 \\
+    \end{tabular}
+  \end{center}
+  \label{tab:J48UnequalTestCost}
+\end{table}
+
+The total cost of this confusion matrix is $ 1431 \times 1 + 121 \times 10 = 2641 $. The cost of the default classifier
+would be equal to the number of clients who would not subscribe to a term deposit; 7941. So as we can see, the cost
+sensitive classifier performs very well on the test set. 
+
+\subsubsection{What I have learned}
+By doing this coursework, I have reinforced the knowledge I gained during the lectures on the way the different classifiers
+work. I understand the preference to provide numerical attributes with a normal distribution for the naive Bayes classifier.
+I strengthened my understanding of how other classifiers like the J4.8 classifier, the logistic regression classifier, and the
+k-nearest neighbour classifier worked. Experimenting with the parameters of each of these classifiers gave me further insight
+into how they work, especially when I experimented with the number of bins parameter for the J4.8 classifier, I could clearly
+see how the J4.8 classifier discretises numerical attributes. I also grew an appreciation for simpler classifiers. The OneR
+classifier, even though it only contains one rule, was able to keep up with other, more complex classifiers.
+
+I am much more comfortable with using Weka. This coursework enabled me to experiment with the attribute selector, showing me
+how to prune attributes which aren't very useful from a dataset. I also enjoyed creating a voting committee, I feel that
+using a voting committee with a lot of similarly performing models may be a very strong option in some scenarios.
+
+Finally, I was able to identify holes in my knowledge by doing this coursework. This enabled me to go through previous labs,
+lectures, and online resources in order to reinforce my knowledge of machine learning and data mining.
 
 \end{document}
