@@ -21,20 +21,21 @@ dataset containing 36,188 instances, and a testing dataset containing 9042 insta
 of data exploration and visualisation techniques were used to examine the dataset which determined
 that we could not predict whether or not a client will subscribe to a term deposit using just two
 attributes. Quite a few of the numerical attributes provided were negatively skewed. Attribute
-selection techniques were used to reduce the original sixteen attributes into two reduced datasets,
+selection techniques were used to reduce the original sixteen attributes into two reduced datasets;
 one with three attributes and another with eight attributes. We then ran a number of machine learning
-algorithms on these datasets, and performed various experiments in order to optimise the parameters used
+algorithms on these datasets and performed various experiments in order to optimise the parameters used
 for these algorithms. The J4.8 model with the minimum number of objects parameter set to 10 performed best
 and was estimated to be 90.6\% accurate (using 10-fold cross-validation). These models were also assessed
 under an unequal cost scenario, where misclassifying a client who will subscribe to a term deposit is 10
-times worse than misclassifying a client who will. The same J4.8 model also performed best in the unequal
-cost scenario, with a cost of 10561. The modal was then ran on the test dataset which contained 9042
+times more than misclassifying a client who will. The same J4.8 model also performed best in the unequal
+cost scenario, with a cost of 10561. The model was then ran on the test dataset which contained 9042
 clients. The default rule on the test dataset had an accuracy of 87.8\% and a cost 7941. The model achieved
 an accuracy of 90.3\% in the equal cost scenario and a cost of 2641 in the unequal cost scenario.
 
 \end{abstract}
 
 \section{Introduction}
+
 We have been provided with a dataset which contains information about customers
 who were targets of direct marketing campaigns of a Portuguese banking institution.
 Our task is to develop models on this dataset to determine whether a customer
@@ -88,8 +89,7 @@ reveals the following...
   the dataset is 36,188.}
   \item{31,981 clients did not subscribe to a term deposit, 4188 clients did subscribe to a term deposit.}
   \item{88.4\% of clients did not subscribe to a term deposit. This is the accuracy of the default classifier.} 
-  \item{There are 16 attributes (excluding the output attribute, 'termDeposit').}
-  \item{Reducing the number of attributes may be beneficial to avoid overfitting.}
+  \item{There are 16 attributes (excluding the output attribute, 'termDeposit'), reducing the number of attributes may be beneficial to avoid overfitting..}
   \item{There are no missing values. However, some attributes have an 'unknown' value.}
   \begin{itemize}
     \item{job (a2): Only 223 clients had an unknown job.}
@@ -134,15 +134,13 @@ in this dataset did not subscribe to a term deposit, which is almost the same as
 \section{Data Preprocessing}
 
 The data provided for us was already split into a training dataset and an evaluation dataset. The test dataset
-and the training dataset both have a similar proportion of clients who did not subscribe to a term deposit. This means
-that we do not have to create a new dataset to evaluate any models we train, we can just use the provided test
-dataset.
+and the training dataset both have a similar proportion of clients who did not subscribe to a term deposit.
 
 The numeric attributes in the dataset are age (a1), balance (a6), day (a10), duration (a12), campaign (a13), pdays (a14), 
 and previous (a15). During the initial exploration of the dataset, we discovered that pdays (a14) and previous (a15) 
 were very negatively skewed. Most clients also had a low / negative balance (a6) (see Figure ~\ref{fig:balanceHistogram}). 
 These non-normal distributions may affect the naive Bayes classifier which assumes that numerical values have a normal 
-distribution. To resolve this, we may need to discretize our numeric attributes. This will be tested when we train
+distribution. To resolve this, we may need to discretise our numeric attributes. This will be tested when we train
 our models by using preprocessing filters.
 
 \begin{figure}[H]
@@ -155,8 +153,8 @@ our models by using preprocessing filters.
 \section{Classification Models}
 
 We are now going to develop classification models using the training set and select the best performing models. This
-will be carried out in five steps: benchmark models, attribute selection, model development, combining models, and
-cost-based modelling.
+will be carried out in five steps: benchmark models, attribute selection, model development, combining models, model selection,
+and cost-based modelling.
 
 \subsection{Benchmark Models}
 
@@ -183,9 +181,8 @@ we enabled the cross-validation option and set the kNN parameter to 10. The resu
 \subsection{Attribute Selection}
 
 In the data exploration stage, we determined that finding a subset of important attributes may help prevent overfitting.
-Overfitting is when a model becomes too complex. It starts memorising data, including noise from the dataset. Overfitting
-does reduce the error rate in the training set but actually increases the error rate in the test set. By reducing the
-number of attributes used by the classification model, overfitting will hopefully by avoided.
+Overfitting is when a model becomes too complex. It starts memorising data, including noise from the dataset. By reducing
+the number of attributes used by the classification model, overfitting will hopefully by avoided.
 
 \begin{itemize}
   \item{By visualising the decision tree of the J4.8 classifier, we can see that the duration (a12) attribute is at the
@@ -207,11 +204,10 @@ number of attributes used by the classification model, overfitting will hopefull
 \end{itemize}
 
 All of these attribute evaluators agree that the two most important attributes are duration (a12) and poutcome (a16).
-pdays (a14) is the third most important attribute according to all of the tested attribute evaluators apart from
-the CFS subset evaluator. Using these three attributes, the performance of the benchmark models is shown in Table
-~\ref{tab:topThreeBenchmark}. Reducing the number of attributes to 3 improves the performance of the naive Bayes
-and the k-nearest neighbour classifiers. The performance of OneR remains unchanged and the performance of J4.8
-and logistic regression is slightly reduced. 
+pdays (a14) is the third most important attribute according to all attribute evaluators apart from the CFS subset 
+evaluator. Using these three attributes, the performance of the benchmark models is shown in Table ~\ref{tab:topThreeBenchmark}. 
+Reducing the number of attributes to 3 improves the performance of the naive Bayes and the k-nearest neighbour classifiers. 
+The performance of OneR remains unchanged and the performance of J4.8 and logistic regression is slightly reduced. 
 
 \begin{table}[H]
   \begin{center}
@@ -230,9 +226,9 @@ and logistic regression is slightly reduced.
 
 The information gain ranking filter, the gain ratio feature evaluator, and the symmetrical uncertainty ranking
 filter all have the same attributes in their top eight but in a different order. The Chi-squared ranking filter
-also has seven of these eight attributes, with housing (a7) not in the top eight, appearing in ninth place.
+also has seven of these eight attributes, with housing (a7), appearing in ninth place.
 Because of this, we have determined an intermediate selection of eight attributes to be: 
-duration a(12), poutcome (a16), pdays (a14), month (a11), contact (a9), age (a1), previous (a15), and housing (a7).
+duration (a12), poutcome (a16), pdays (a14), month (a11), contact (a9), age (a1), previous (a15), and housing (a7).
 The performance of the classifiers with these eight attributes as seen in Table ~\ref{tab:topEightBenchmark} show
 that increasing the number of attributes to eight slightly reduces the performance of the k-nearest neighbour
 classifier. The performance of the J4.8 and the logistic regression classifiers are slightly increased. 
@@ -259,16 +255,16 @@ for each model.
 
 \subsubsection{Naive Bayes}
 
-This model had the same performance on the three-attribute dataset and the eight-attribute dataset so we will
-experiment with both datasets to determine the settings for the most optimal model. The naive Bayes classifier
+This model had the same performance on the three-attribute dataset and the eight-attribute dataset so we experimented 
+with both datasets to determine the settings for the most optimal model. The naive Bayes classifier
 assumes that numeric attributes have a normal distribution. During our initial data exploration, we discovered
 that some attributes, namely pdays (a14) and previous (a15) were very negatively skewed. The balance (a6) attribute
-also had a negatively skewed distribution but this attribute is not in the datasets used for this model. The
+also had a negatively skewed distribution but this attribute is not in the datasets used to train this model. The
 easiest way to resolve this issue is to run the discretise filter. This will discretise numerical attributes into
 a specified number of nominal bins.
 
 Attributes in both datasets were discretised into 10 bins of equal frequency for both datasets. For the three-attribute
-dataset, the naive Bayes classifier achieved an accuracy of 89.3\%, a slight improvement when compared to the benchmark.
+dataset, the naive Bayes classifier achieved an accuracy of 89.3\%, a slight improvement when compared to the base benchmark.
 An accuracy of 88.2\% was achieved by the naive Bayes classifier after discretising the eight-attribute dataset into
 10 bins of equal frequency.
 
@@ -297,7 +293,7 @@ dataset and discretising the numerical attributes into 15 bins of equal frequenc
 \subsubsection{k-nearest Neighbour}
 
 For this model, we continued to use 9 neighbours and the three-attribute dataset as the model performed best on this dataset.
- We experimented with the distance weighting parameters and the results can be found in Table ~\ref{tab:kNNParams}
+We experimented with the distance weighting parameters and the results can be found in Table ~\ref{tab:kNNParams}
 
 \begin{table}[H]
   \begin{center}
@@ -312,7 +308,7 @@ For this model, we continued to use 9 neighbours and the three-attribute dataset
   \label{tab:kNNParams}
 \end{table}
 
-As you can see in Table ~\ref{tab:kNNParams}, changing the distance weighting has no effect on the accuracy of this model.
+As you can see in Table ~\ref{tab:kNNParams}, changing the distance weighting had no effect on the accuracy of this model.
 No distance weighting needs to be done.
 
 \subsubsection{J4.8}
@@ -342,8 +338,8 @@ all attributes so all of the experiments were carried out on the original traini
   \label{tab:J48Params}
 \end{table}
 
-The best performing model is when the minimum number of objects parameter is set to 10. The other models do have similar
-accuracies but we went forward using the parameter that gave us the most accuracy for this model.
+The table above shows that the best performing model for this classifier is produced when the minimum number of objects
+parameter is set to 10.
 
 \subsubsection{OneR}
 
@@ -391,7 +387,7 @@ in a more flexible model. The results of experimenting with the ridge value are 
       $ 1 \times 10 $ & 90.2\% \\
     \end{tabular}
   \end{center}
-  \caption{Results of varying the minimum bucket size parameter}
+  \caption{Results of varying the ridge value}
   \label{tab:LogisticParams}
 \end{table}
 
@@ -401,7 +397,7 @@ model in any meaningful way, so we decided to keep the ridge parameter at it's d
 \subsubsection{Voting Committee}
 
 We now have five strongly performing models. All these models have an accuracy that is better than the default accuracy (88.4\%).
-We tried to combine all these models into a voting committee, all the models will vote on whether a client will subscribe to a term
+We combined all these models into a voting committee; all the models will vote on whether a client will subscribe to a term
 deposit or not and the majority wins. The models chosen are naive Bayes with numerical attributes being discretised
 into 15 bins of equal frequency, k-nearest neighbour with k set to 9, J4.8 with the minimum number of objects parameter set to 10,
 OneR with the minimum bucket size parameter set to 18, and logistic regression with default parameters.
@@ -411,9 +407,9 @@ our models on the eight-attribute dataset. This dataset gives us the best perfor
 classifiers. The performances of the other classifiers are only very slightly reduced on the eight attribute dataset when compared
 to the optimal dataset for these classifiers.
 
-After running the voting committee on the dataset with the best setting for all five classifiers, the overall performance with
-10-fold cross-validation was \textbf{90.0\%}. While this is pretty accurate, the voting committee is still beaten by both
-the logistic regression model and the J4.8 model.
+After running the voting committee on the dataset with the best parameter settings for all five classifiers, t
+he overall performance with 10-fold cross-validation was \textbf{90.0\%}. While this is pretty accurate, the
+voting committee is still beaten by both the logistic regression model and the J4.8 model.
 
 \subsubsection{Model Selection}
 
@@ -461,11 +457,10 @@ The cost of this matrix is $ 5563 \times 1 + 1496 \times 10 = 20523 $.
 
 \subsubsection{k-nearest Neighbour}
 
-We ran this classifier with the three-attribute dataset, 9 neighbours, and no distance weighting. We ran this
-classifier with the cost sensitive meta classifier. Because the k-nearest neighbour classifier does not give us
-estimates of class posterior probability, we will set the minimise expected cost parameter to false. This tells
-the meta classifier to reweigh the training instances using the cost matrix. This resulted in the following
-confusion matrix:
+We ran this classifier with the cost sensitive meta classifier, using the three-attribute dataset, 9 neighbours, 
+and no distance weighting. Because the k-nearest neighbour classifier does not give us estimates of class posterior 
+probability, we will set the minimise expected cost parameter to false. This tells the meta classifier to reweigh 
+the training instances using the cost matrix. This resulted in the following confusion matrix:
 
 \begin{table}[H]
   \begin{center}
@@ -536,10 +531,9 @@ The cost of this matrix is $ 6606 \times 1 + 514 \times 10 = 11746 $. This is wo
 other costs.
 
 \subsubsection{Model Selection}
-From the results reported here, we can clearly see that the J4.8 classifier produces the best model for the unequal
-cost problem. It significantly outperforms most of the other classifiers, with only the logistic regression classifier
-coming close. Because of this, it is not worth developing a voting model, the J4.8 classifier is the way to go for
-this scenario.
+From the results reported here, we can clearly see that the J4.8 model is the best for the unequal
+cost problem. It significantly outperforms most of the other models, with only the logistic regression model
+coming close. Because of this, it is not worth developing a voting model, the J4.8 model is clearly the way to go
 
 \section{Conclusion}
 
@@ -554,14 +548,14 @@ for this classifier was:
 \begin{table}[H]
   \begin{center}
     \begin{tabular}{l l }
-      7774 & 167 \\
-      737 & 363 \\
+      7611 & 330 \\
+      548 & 553 \\
     \end{tabular}
   \end{center}
   \label{tab:J48EqualTestCost}
 \end{table}
 
-Running the cost sensitive J4.8 model on the test set with unequal costs gave us the following confusion matrix.
+Running the cost sensitive J4.8 model on the test set with unequal costs gave us the following confusion matrix:
 
 \begin{table}[H]
   \begin{center}
@@ -582,7 +576,7 @@ By doing this coursework, I have reinforced the knowledge I gained during the le
 work. I understand the preference to provide numerical attributes with a normal distribution for the naive Bayes classifier.
 I strengthened my understanding of how other classifiers like the J4.8 classifier, the logistic regression classifier, and the
 k-nearest neighbour classifier worked. Experimenting with the parameters of each of these classifiers gave me further insight
-into how they work, especially when I experimented with the number of bins parameter for the J4.8 classifier, I could clearly
+into their inner workings, especially when I experimented with the number of bins parameter for the J4.8 classifier. I could clearly
 see how the J4.8 classifier discretises numerical attributes. I also grew an appreciation for simpler classifiers. The OneR
 classifier, even though it only contains one rule, was able to keep up with other, more complex classifiers.
 
